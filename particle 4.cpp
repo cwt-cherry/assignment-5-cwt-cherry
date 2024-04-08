@@ -27,24 +27,38 @@ particle& particle::operator=(const particle& copy)
 
 // Move assignment operator
 // The move assignment operator needs to correctly reassign the memory from the original object
-particle& particle::operator=(particle&& move) noexcept
-{
-  std::cout<<"calling move operator\n";
-  if(this != &move)
-  {
-    name = move.name;
-    charge = move.charge;
-    antiparticle = move.antiparticle;
-    momentum_x = move.momentum_x;
-    momentum_y = move.momentum_y;
-    momentum_z = move.momentum_z;
+// particle& particle::operator=(particle&& move) noexcept
+// {
+//   std::cout<<"calling move operator\n";
+//   if(this != &move)
+//   {
+//     name = move.name;
+//     charge = move.charge;
+//     antiparticle = move.antiparticle;
+//     momentum_x = move.momentum_x;
+//     momentum_y = move.momentum_y;
+//     momentum_z = move.momentum_z;
 
-    delete four_momentum;
-    four_momentum = move.four_momentum;
-    move.four_momentum = nullptr;
-  }
-  return *this;
+//     delete four_momentum;
+//     four_momentum = move.four_momentum;
+//     move.four_momentum = nullptr;
+//   }
+//   return *this;
+// }
+
+particle(particle&& move) noexcept :
+  name{std::move(move.name)}, 
+  charge{move.charge}, 
+  antiparticle{move.antiparticle}, 
+  energy{move.energy}, 
+  momentum_x{move.momentum_x}, 
+  momentum_y{move.momentum_y}, 
+  momentum_z{move.momentum_z}, 
+  four_momentum{move.four_momentum} // Transfer ownership
+{
+  move.four_momentum = nullptr; // Reset source object's pointer
 }
+
 
 // Sum operator
 particle particle::operator+(const particle &other) const

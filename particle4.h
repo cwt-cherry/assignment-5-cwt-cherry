@@ -31,14 +31,23 @@ public:
   // Parameterised Constructor
   // The parameterised constructor needs to dynamically allocate the std::vector containing the four-vector elements
   // The parameterised constructor also needs to check the validity of the energy component
+  // particle(string particle_name, int particle_charge, bool particle_antiparticle, double particle_energy, double particle_momentum_x, double particle_momentum_y, double particle_momentum_z):
+  //   name{particle_name}, charge{particle_charge}, antiparticle(particle_antiparticle), energy{particle_energy}, momentum_x{particle_momentum_x}, momentum_y{particle_momentum_y}, momentum_z{particle_momentum_z}, four_momentum{new std::vector<double>}
+  // {
+  //   four_momentum->push_back(energy/speed_of_light);
+  //   four_momentum->push_back(momentum_x);
+  //   four_momentum->push_back(momentum_y);
+  //   four_momentum->push_back(momentum_z);
+  // }
   particle(string particle_name, int particle_charge, bool particle_antiparticle, double particle_energy, double particle_momentum_x, double particle_momentum_y, double particle_momentum_z):
-    name{particle_name}, charge{particle_charge}, antiparticle(particle_antiparticle), energy{particle_energy}, momentum_x{particle_momentum_x}, momentum_y{particle_momentum_y}, momentum_z{particle_momentum_z}, four_momentum{new std::vector<double>}
+    name{particle_name}, charge{particle_charge}, antiparticle{particle_antiparticle}
   {
-    four_momentum->push_back(energy/speed_of_light);
-    four_momentum->push_back(momentum_x);
-    four_momentum->push_back(momentum_y);
-    four_momentum->push_back(momentum_z);
+      if (particle_energy < 0) {
+          throw std::invalid_argument("Energy should be non-negative.");
+      }
+      four_momentum = new std::vector<double>{particle_energy, particle_momentum_x, particle_momentum_y, particle_momentum_z};
   }
+
 
   // Destructor
   ~particle()
