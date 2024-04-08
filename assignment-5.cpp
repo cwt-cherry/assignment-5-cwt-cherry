@@ -17,13 +17,18 @@ class lepton
   private:
 
   protected:
-    string name; // electron or muon
+    string name; // electron, muon, tau, neutrino
     double rest_mass{0}; // Unit of MeV
     int charge{1}; // -1 or +1
     const double speed_of_light = 2.9979245e8; // Unit of m/s
     double velocity{0}; // Between 0 and c, in m/s
     double beta{0}; // Between 0-1
     bool antiparticle;
+
+    static double random_value() 
+    {
+      return static_cast<double>(std::rand()) / RAND_MAX;
+    }
   
   public:
     // default constructor
@@ -43,7 +48,105 @@ class lepton
 // Derived classes for other particles, and four-momentum class go here
 
 // electron class (derived class)
+class electronClass: public lepton
+{
+  // private:
+  //   string electron;
+  //   double mass{0.511};
+  //   int charge{-1};
+  //   double velocity{0};
+  //   bool antiparticle;
 
+  public:
+    // dafault constructor
+    electronClass(): lepton{} {}
+
+    // parameterised constructor
+    electronClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    
+    // Constructor for Electron
+    electronClass(): lepton("electron", 0.511, -1, random_value(), false) {}
+
+    // Constructor for Positron (antielectron)
+    static electronClass positron()
+    {
+      return electronClass("positron", 0.511, +1, random_value(), true);
+    }
+
+    // destructor
+    ~electronClass() {std::cout<<"Destroying "<<name<<std::endl;}
+
+};
+
+// muon class (derived class)
+class muonClass: public lepton
+{
+  private:
+
+  public:
+    // default constructor
+    muonClass(): lepton{} {}
+
+    // parameterised constructor
+    muonClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    
+    // Constructor for muon
+    muonClass(): lepton("muon", 105.6, -1, random_value(), false) {}
+
+    // Constructor for antimuon
+    static muonClass antimuon()
+    {
+      return muonClass("antimuon", 105.6, +1, random_value(), true);
+    }
+
+};
+
+// tau class (derived class)
+class tauClass: public lepton
+{
+  private:
+  public:
+
+    // default constructor
+    tauClass(): lepton{} {}
+
+    // parameterised constructor
+    tauClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    
+    // Constructor for tau
+    tauClass(): lepton("tau", 1777, -1, random_value(), false) {}
+
+    // Constructor for antitau
+    static tauClass positron()
+    {
+      return tauClass("antitau", 1777, +1, random_value(), true);
+    }
+};
+
+// neutrinos class (derived class)
+class neutrinoClass: public lepton
+{
+  private:
+  public:
+    // default constructor
+    neutrinoClass(): lepton{} {}
+
+    // parameterised constructor
+    neutrinoClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    
+    // Constructor for neutrinos
+    neutrinoClass(): lepton("neutrino", 940.6, 0, random_value(), false) {}
+
+    // Constructor for Positron (antineutrinos)
+    static neutrinoClass positron()
+    {
+      return neutrinoClass("antineutrino", 940.6, 0, random_value(), true);
+    }
+};
 
 // four-momentum class
 class FourMomentum
