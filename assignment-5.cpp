@@ -77,30 +77,51 @@ class electronClass: public lepton
     // destructor
     ~electronClass() {std::cout<<"Destroying "<<name<<std::endl;}
 
+    // data members (cpp file)
+    // assume calorimeter has 4 layers, measure the energy a particle loses as it passes through the detector 
+    // EM_1, EM_2, HAD_1, HAD_2
+    // liquid argon calorimeter (LAr):
+    // measures the energy of electrons, photons and hadrons, identify photons and electrons
+    // tile hadronic calorimeter:
+    // measure energy of hadronic particles
+
 };
 
 // muon class (derived class)
 class muonClass: public lepton
 {
   private:
+    bool isolated_status; // indicate if muon is isolated from other particles
 
   public:
     // default constructor
-    muonClass(): lepton{} {}
+    muonClass(): lepton{}, isolated_status{false} {}
 
     // parameterised constructor
-    muonClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    muonClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, bool particle_isolated_status): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), isolated_status{particle_isolated_status} {}
     
     // Constructor for muon
-    muonClass(): lepton("muon", 105.6, -1, random_value(), false) {}
+    muonClass(): lepton("muon", 105.6, -1, random_value(), false), isolated_status{false} {}
 
     // Constructor for antimuon
     static muonClass antimuon()
     {
-      return muonClass("antimuon", 105.6, +1, random_value(), true);
+      return muonClass("antimuon", 105.6, +1, random_value(), true, false);
     }
 
+    // data members (cpp file)
+
+    // Getter and setter for isolated status
+    void set_isolated_status(bool status) 
+    { 
+      isolated_status = status;
+    }
+
+    bool get_isolated_status() const 
+    { 
+      return isolated_status; 
+    }
 };
 
 // tau class (derived class)
@@ -130,22 +151,54 @@ class tauClass: public lepton
 class neutrinoClass: public lepton
 {
   private:
+    string flavour;
+    bool hasInteracted; // whether particle interacts with detector *(set to false for now)
+
   public:
     // default constructor
-    neutrinoClass(): lepton{} {}
+    neutrinoClass(): lepton{}, flavour{}, hasInteracted{} {}
 
     // parameterised constructor
-    neutrinoClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    neutrinoClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, string particle_flavour, bool particle_interaction): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), flavour{particle_flavour}, hasInteracted{particle_interaction} {}
+    
+    // setter and getters
+    void set_flavour(const string& particle_flavour)
+    {
+        flavour = particle_flavour;
+    }
+
+    string get_flavour() const
+    {
+      return flavour;
+    }
+
+    void set_interaction(bool interaction_status)
+    {
+      hasInteracted = interaction_status;
+    }
+
+    bool get_interaction() const
+    {
+      return hasInteracted;
+    }
     
     // Constructor for neutrinos
-    neutrinoClass(): lepton("neutrino", 940.6, 0, random_value(), false) {}
+    //neutrinoClass(): lepton("neutrino", 940.6, 0, random_value(), false), flavour(get_flavour), hasInteracted(get_interaction) {}
+    static neutrinoClass neutrino()
+    {
+      return neutrinoClass("neutrino", 940.6, 0, random_value(), false), flavour(get_flavour), hasInteracted(get_interaction);
+    }
 
     // Constructor for Positron (antineutrinos)
-    static neutrinoClass positron()
+    static neutrinoClass antineutrino()
     {
-      return neutrinoClass("antineutrino", 940.6, 0, random_value(), true);
+      return neutrinoClass("antineutrino", 940.6, 0, random_value(), true), flavour(get_flavour), hasInteracted(get_interaction);
     }
+
+    // data member (cpp)
+
+
 };
 
 // four-momentum class
