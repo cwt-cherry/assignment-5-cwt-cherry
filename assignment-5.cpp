@@ -199,8 +199,6 @@ class muonClass: public lepton
 class tauClass: public lepton
 {
   private:
-    bool hadronic_decay;
-    bool leptonic_decay;
     std::unique_ptr<lepton> decay_product_1; // Smart pointer for decay product 1
     std::unique_ptr<tauClass> decay_product_2; // Smart pointer for decay product 2
     std::unique_ptr<neutrinoClass> decay_product_3; // Smart pointer for decay product 3
@@ -208,11 +206,11 @@ class tauClass: public lepton
   public:
 
     // default constructor
-    tauClass(): lepton{}, leptonic_decay{} {}
+    tauClass(): lepton{} {}
 
     // parameterised constructor
     tauClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, bool particle_leptonic_decay, bool particle_hadronic_decay): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), leptonic_decay{particle_leptonic_decay}, hadronic_decay{particle_hadronic_decay} {}
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
 
     // destructor
     ~tauClass() {std::cout<<"Destroying "<<name<<std::endl;} 
@@ -230,10 +228,9 @@ class tauClass: public lepton
     }
 
     // Flag for hadronic decay
-    void set_hadronic_decay(bool decay)
+    void hadronic_decay(bool decay)
     {
-      hadronic_decay = decay;
-      if(hadronic_decay)
+      if(decay==true)
       {
         if(name=="tau")
         {
@@ -256,10 +253,10 @@ class tauClass: public lepton
       }
     }
 
-    void set_leptonic_decay(bool decay)
+    // Flag for leptonic decay
+    void leptonic_decay(bool decay)
     {
-      leptonic_decay =  decay;
-      if (leptonic_decay)
+      if (decay==true)
       {
         if (name=="tau")
         {
@@ -379,7 +376,7 @@ class FourMomentum
     // destructor
     ~FourMomentum() {}
 
-    // setter for energy
+    // setters
     void set_energy(double particle_energy)
     {
       if(particle_energy >= 0) // not limiting energy to the speed of light due to change in slides
@@ -390,6 +387,100 @@ class FourMomentum
       {
         throw std::invalid_argument("Energy should be positive.");
       }
+    }
+
+    void set_momentum_x(double particle_momentum_x)
+    {
+      if(particle_momentum_x >= 0) // not limiting energy to the speed of light due to change in slides
+      {
+        momentum_x = particle_momentum_x;
+      }
+      else
+      {
+        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
+        exit(0);
+      }
+    }
+
+    void set_momentum_y(double particle_momentum_y)
+    {
+      if(particle_momentum_y >= 0) // not limiting energy to the speed of light due to change in slides
+      {
+        momentum_y = particle_momentum_y;
+      }
+      else
+      {
+        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
+        exit(0);
+      }
+    }
+
+    void set_momentum_z(double particle_momentum_z)
+    {
+      if(particle_momentum_z >= 0) // not limiting energy to the speed of light due to change in slides
+      {
+        momentum_z = particle_momentum_z;
+      }
+      else
+      {
+        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
+        exit(0);
+      }
+    }
+
+    // getters
+    double get_energy() const {return energy;}
+    double get_momentum_x() const {return momentum_x;}
+    double get_momentum_y() const {return momentum_y;}
+    double get_momentum_z() const {return momentum_z;}
+
+    // Copy constructor
+    FourMomentum(const FourMomentum& copy): energy{copy.energy}, momentum_x{copy.momentum_x}, momentum_y{copy.momentum_y}, momentum_z{copy.momentum_z}
+    {
+      std::cout<<"calling copy constructor of four momentum\n";
+    }
+
+    // Copy assignment operator
+    FourMomentum& operator=(const FourMomentum& copy)
+    {
+      std::cout<<"calling copy operator of four momentum\n";
+      if (this != &copy)
+      {
+        energy = copy.energy;
+        momentum_x = copy.momentum_x;
+        momentum_y = copy.momentum_y;
+        momentum_z = copy.momentum_z;
+      }
+      return *this;
+    }
+
+    // Move constructor
+    FourMomentum(FourMomentum&& move) noexcept: energy{move.energy}, momentum_x{move.momentum_x}, momentum_y{move.momentum_y}, momentum_z{move.momentum_z}
+    {
+      std::cout<<"calling move constructor of four momentum\n";
+      move.energy = 0;
+      move.momentum_x = 0;
+      move.momentum_y = 0;
+      move.momentum_z = 0;
+    }
+
+    // Move assignment operator
+    FourMomentum& operator=(FourMomentum&& move) noexcept
+    {
+      std::cout<<"calling move operator of four momentum\n";
+      if (this != &move)
+      {
+        energy = move.energy;
+        momentum_x = move.momentum_x;
+        momentum_y = move.momentum_y;
+        momentum_z = move.momentum_z;
+        // Reset other object
+        move.energy = 0;
+        move.momentum_x = 0;
+        move.momentum_y = 0;
+        move.momentum_z = 0;
+      }
+        return *this;
     }
 
     // smart pointer to a four-momentum object contained in each particle (unique or shared)
