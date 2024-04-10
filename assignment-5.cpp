@@ -53,8 +53,7 @@ class FourMomentum
       }
       else
       {
-        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid momentum. Momentum should be positive.");
       }
     }
 
@@ -66,8 +65,7 @@ class FourMomentum
       }
       else
       {
-        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid momentum. Momentum should be positive.");
       }
     }
 
@@ -79,8 +77,7 @@ class FourMomentum
       }
       else
       {
-        std::cerr<<"Invalid momentum. Momentum should be between positive."<<std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid momentum. Momentum should be positive.");
       }
     }
 
@@ -161,11 +158,6 @@ class lepton
     double beta{0}; // Between 0-1
     bool antiparticle;
     std::unique_ptr<FourMomentum> fourMomentum; // Smart pointer to FourMomentum object
-
-    static double random_value() 
-    {
-      return static_cast<double>(std::rand()) / RAND_MAX;
-    }
   
   public:
     // default constructor
@@ -178,7 +170,9 @@ class lepton
     {}
 
     // Destructor
-    ~lepton() {std::cout<<"Destroying "<<name<<std::endl;}
+    //~lepton() {std::cout<<"Destroying "<<name<<std::endl;}
+    virtual ~lepton() {std::cout << "Destroying " << name << std::endl;}
+
 
     // Setter functions
     void set_name(string particle_name)
@@ -189,8 +183,7 @@ class lepton
       }
       else
       {
-        std::cerr << "Invalid particle name." << std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid particle name.");
       }
     }
 
@@ -204,8 +197,7 @@ class lepton
       }
       else
       {
-        std::cerr << "Invalid particle charge. Value should be either +1 or -1" << std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid particle charge. Value should be either +1 or -1");
       }
     }
 
@@ -217,8 +209,7 @@ class lepton
       }
       else
       {
-        std::cerr<<"Invalid velocity. Velocity should be between 0 and the speed of light."<<std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid velocity. Velocity should be between 0 and the speed of light.");
       }
     }
 
@@ -230,8 +221,7 @@ class lepton
       }
       else
       {
-        std::cerr<<"Invalid beta value. Value should be between 0 and 1."<<std::endl;
-        exit(0);
+        throw std::invalid_argument("Invalid beta value. Value should be between 0 and 1.");
       }
     }
 
@@ -246,7 +236,7 @@ class lepton
   bool get_antiparticle() const {return antiparticle;}
 
   // Function to print info about a particle
-  void lepton::print_data() const
+  void print_data() const
   {
     std::cout<<"particle type: "<<get_name()<<std::endl;
     std::cout<<"rest mass: "<<get_rest_mass()<<" MeV"<<std::endl;
@@ -260,8 +250,17 @@ class lepton
   friend double dot_product(const lepton& particle1, const lepton& particle2);
   friend FourMomentum sum(const lepton& particle1, const lepton& particle2);
 
+  // Static member function declaration
+  static double random_value();
+
 };
 // End of lepton class and associated member functions
+
+// Static member function definition
+double lepton::random_value()
+{
+  return static_cast<double>(std::rand()) / RAND_MAX;
+}
 
 // Friend function to calculate the dot product of two Lepton objects
 double dot_product(const lepton& particle1, const lepton& particle2)
@@ -367,7 +366,10 @@ class muonClass: public lepton
     ~muonClass() {std::cout<<"Destroying "<<name<<std::endl;}
 
     // Constructor for muon
-    muonClass(): lepton("muon", 105.6, -1, random_value(), false), isolated_status{false} {}
+    static muonClass muon()
+    {
+      return muonClass("muon", 105.6, -1, random_value(), false, false);
+    }
 
     // Constructor for antimuon
     static muonClass antimuon()
@@ -459,7 +461,7 @@ class tauClass: public lepton
           decay_product_2 = std::make_unique<tauClass>(tauClass::tau()); // Creating a tau object using the static member function
           decay_product_3 = std::make_unique<neutrinoClass>();
           decay_product_3->set_flavour(decay_product_1->get_name());
-          delete this;
+          //delete this;
         }
         else if (name=="antitau")
         {
@@ -468,7 +470,7 @@ class tauClass: public lepton
           decay_product_2 = std::make_unique<tauClass>(tauClass::antitau()); // Creating an antitau object using the static member function
           decay_product_3 = std::make_unique<neutrinoClass>();
           decay_product_3->set_flavour(decay_product_1->get_name());
-          delete this;
+          //delete this;
         }
         else
         {

@@ -87,7 +87,7 @@ public:
   // Dot product operator
   double dot_product(const particle& other) const;
 
-  // Setter functions, to change values of 4-momentum 
+  // Setter functions
   void set_name(string particle_name)
   {
     if(particle_name == "electron" || particle_name == "positron" || particle_name == "muon" || particle_name == "antimuon")
