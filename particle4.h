@@ -48,7 +48,6 @@ public:
       four_momentum = new std::vector<double>{particle_energy, particle_momentum_x, particle_momentum_y, particle_momentum_z};
   }
 
-
   // Destructor
   ~particle()
   {

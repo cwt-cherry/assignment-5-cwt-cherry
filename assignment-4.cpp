@@ -77,3 +77,36 @@ int main()
 
   return 0;
 }
+
+// // Add two electrons
+//   particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+//   particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
+
+//   // Add four muons
+//   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+//   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+//   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+//   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+//   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+
+//   // Add one antielectron
+//   particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
+
+//   // Add one antimuon
+//   particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
+
+//   // Add one muon neutrino
+//   particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::neutrino()));
+
+//   // Add one electron neutrino
+//   particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::antineutrino()));
+
+//   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
+//   tauClass tauParticle = tauClass::tau();
+//   tauParticle.leptonic_decay(true);
+//   particles.push_back(std::make_shared<tauClass>(tauParticle));
+
+//   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
+//   tauClass antitauParticle = tauClass::antitau();
+//   antitauParticle.leptonic_decay(true);
+//   particles.push_back(std::make_shared<tauClass>(antitauParticle));
