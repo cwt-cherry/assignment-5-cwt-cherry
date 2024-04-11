@@ -157,15 +157,15 @@ class lepton
     double velocity{0}; // Between 0 and c, in m/s
     double beta{0}; // Between 0-1
     bool antiparticle;
-    std::unique_ptr<FourMomentum> fourMomentum; // Smart pointer to FourMomentum object
+    std::shared_ptr<FourMomentum> fourMomentum; // Smart pointer to FourMomentum object
   
   public:
     // default constructor
-    lepton(): name{}, rest_mass{}, charge{}, velocity{}, beta{}, antiparticle{}, fourMomentum(std::make_unique<FourMomentum>()) {}
+    lepton(): name{}, rest_mass{}, charge{}, velocity{}, beta{}, antiparticle{}, fourMomentum(std::make_shared<FourMomentum>()) {}
 
     // Parameterised Constructor
     lepton(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle):
-      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), fourMomentum(std::make_unique<FourMomentum>())
+      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), fourMomentum(std::make_shared<FourMomentum>())
 
     {}
 
@@ -252,6 +252,61 @@ class lepton
 
   // Static member function declaration
   static double random_value();
+
+  // Copy constructor
+  lepton(const lepton& copy):
+      name(copy.name),
+      rest_mass(copy.rest_mass),
+      charge(copy.charge),
+      velocity(copy.velocity),
+      beta(copy.beta),
+      antiparticle(copy.antiparticle),
+      fourMomentum(copy.fourMomentum ? std::make_shared<FourMomentum>(*copy.fourMomentum) : nullptr)
+  {}
+
+  // Copy assignment operator
+  lepton& operator=(const lepton& copy)
+  {
+      if (this != &copy)
+      {
+          name = copy.name;
+          rest_mass = copy.rest_mass;
+          charge = copy.charge;
+          velocity = copy.velocity;
+          beta = copy.beta;
+          antiparticle = copy.antiparticle;
+          fourMomentum = copy.fourMomentum ? std::make_shared<FourMomentum>(*copy.fourMomentum) : nullptr;
+      }
+      return *this;
+  }
+
+  // Move constructor
+  lepton(lepton&& move) noexcept:
+      name(std::move(move.name)),
+      rest_mass(std::move(move.rest_mass)),
+      charge(std::move(move.charge)),
+      velocity(std::move(move.velocity)),
+      beta(std::move(move.beta)),
+      antiparticle(std::move(move.antiparticle)),
+      fourMomentum(std::move(move.fourMomentum))
+  {}
+
+  // Move assignment operator
+  lepton& operator=(lepton&& move) noexcept
+  {
+      if (this != &move)
+      {
+          name = std::move(move.name);
+          rest_mass = std::move(move.rest_mass);
+          charge = std::move(move.charge);
+          velocity = std::move(move.velocity);
+          beta = std::move(move.beta);
+          antiparticle = std::move(move.antiparticle);
+          fourMomentum = std::move(move.fourMomentum);
+      }
+      return *this;
+  }
+
 
 };
 // End of lepton class and associated member functions
@@ -391,96 +446,6 @@ class muonClass: public lepton
     }
 };
 
-// tau class (derived class)
-class tauClass: public lepton
-{
-  private:
-    std::unique_ptr<lepton> decay_product_1; // Smart pointer for decay product 1
-    std::unique_ptr<tauClass> decay_product_2; // Smart pointer for decay product 2
-    std::unique_ptr<neutrinoClass> decay_product_3; // Smart pointer for decay product 3
-
-  public:
-
-    // default constructor
-    tauClass(): lepton{} {}
-
-    // parameterised constructor
-    tauClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, bool particle_leptonic_decay, bool particle_hadronic_decay): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
-
-    // destructor
-    ~tauClass() {std::cout<<"Destroying "<<name<<std::endl;} 
-
-    // Constructor for tau
-    static tauClass tau()
-    {
-      return tauClass("antitau", 1777, -1, random_value(), false, true, false);
-    }
-
-    // Constructor for antitau
-    static tauClass antitau()
-    {
-      return tauClass("antitau", 1777, +1, random_value(), true, true, false);
-    }
-
-    // Flag for hadronic decay
-    void hadronic_decay(bool decay)
-    {
-      if(decay==true)
-      {
-        if(name=="tau")
-        {
-          std::cout<<"Tau undergoes hadronic decay into hadrons and a tau neutrino."<<std::endl;
-          // change tau (obj) into hadrons and tau neutrino (using the objects from derived class)
-        }
-        else if(name=="antitau")
-        {
-          std::cout<<"Antitau undergoes hadronic decay into hadrons and a antitau neutrino."<<std::endl;
-          // change the antitau object into hadrons and antitau neutrino (using the objects from derived class)
-        }
-        else
-        {
-          throw std::invalid_argument("Invalid decay status.");
-        }
-      }
-      else
-      {
-        throw std::invalid_argument("Tau/ antitau does not go through hadronic decay.");
-      }
-    }
-
-    // Flag for leptonic decay
-    void leptonic_decay(bool decay)
-    {
-      if (decay==true)
-      {
-        if (name=="tau")
-        {
-          // Smart pointers for decay products
-          decay_product_1 = std::make_unique<lepton>();
-          decay_product_2 = std::make_unique<tauClass>(tauClass::tau()); // Creating a tau object using the static member function
-          decay_product_3 = std::make_unique<neutrinoClass>();
-          decay_product_3->set_flavour(decay_product_1->get_name());
-          //delete this;
-        }
-        else if (name=="antitau")
-        {
-          // Smart pointers for decay products
-          decay_product_1 = std::make_unique<lepton>();
-          decay_product_2 = std::make_unique<tauClass>(tauClass::antitau()); // Creating an antitau object using the static member function
-          decay_product_3 = std::make_unique<neutrinoClass>();
-          decay_product_3->set_flavour(decay_product_1->get_name());
-          //delete this;
-        }
-        else
-        {
-          throw std::invalid_argument("Invalid decay status.");
-        }
-      }
-    }
-
-};
-
 // neutrinos class (derived class)
 class neutrinoClass: public lepton
 {
@@ -548,6 +513,95 @@ class neutrinoClass: public lepton
 
     // data member (cpp)
 
+};
+
+// tau class (derived class)
+class tauClass: public lepton
+{
+  private:
+    std::shared_ptr<lepton> decay_product_1; // Smart pointer for decay product 1
+    std::shared_ptr<tauClass> decay_product_2; // Smart pointer for decay product 2
+    std::shared_ptr<neutrinoClass> decay_product_3; // Smart pointer for decay product 3
+
+  public:
+
+    // default constructor
+    tauClass(): lepton{} {}
+
+    // parameterised constructor
+    tauClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, bool particle_leptonic_decay, bool particle_hadronic_decay): 
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+
+    // destructor
+    ~tauClass() {std::cout<<"Destroying "<<name<<std::endl;} 
+
+    // Constructor for tau
+    static tauClass tau()
+    {
+      return tauClass("antitau", 1777, -1, random_value(), false, true, false);
+    }
+
+    // Constructor for antitau
+    static tauClass antitau()
+    {
+      return tauClass("antitau", 1777, +1, random_value(), true, true, false);
+    }
+
+    // Flag for hadronic decay
+    void hadronic_decay(bool decay)
+    {
+      if(decay==true)
+      {
+        if(name=="tau")
+        {
+          std::cout<<"Tau undergoes hadronic decay into hadrons and a tau neutrino."<<std::endl;
+          // change tau (obj) into hadrons and tau neutrino (using the objects from derived class)
+        }
+        else if(name=="antitau")
+        {
+          std::cout<<"Antitau undergoes hadronic decay into hadrons and a antitau neutrino."<<std::endl;
+          // change the antitau object into hadrons and antitau neutrino (using the objects from derived class)
+        }
+        else
+        {
+          throw std::invalid_argument("Invalid decay status.");
+        }
+      }
+      else
+      {
+        throw std::invalid_argument("Tau/ antitau does not go through hadronic decay.");
+      }
+    }
+
+    // Flag for leptonic decay
+    void leptonic_decay(bool decay)
+    {
+      if (decay==true)
+      {
+        if (name=="tau")
+        {
+          // Smart pointers for decay products
+          decay_product_1 = std::make_shared<lepton>();
+          decay_product_2 = std::make_shared<tauClass>(tauClass::tau()); // Creating a tau object using the static member function
+          decay_product_3 = std::make_shared<neutrinoClass>();
+          decay_product_3->set_flavour(decay_product_1->get_name());
+          //delete this;
+        }
+        else if (name=="antitau")
+        {
+          // Smart pointers for decay products
+          decay_product_1 = std::make_shared<lepton>();
+          decay_product_2 = std::make_shared<tauClass>(tauClass::antitau()); // Creating an antitau object using the static member function
+          decay_product_3 = std::make_shared<neutrinoClass>();
+          decay_product_3->set_flavour(decay_product_1->get_name());
+          //delete this;
+        }
+        else
+        {
+          throw std::invalid_argument("Invalid decay status.");
+        }
+      }
+    }
 
 };
 
@@ -557,40 +611,40 @@ class neutrinoClass: public lepton
 int main()
 {
   // Create a vector of particles
-  std::vector<std::unique_ptr<lepton>> particles;
+  std::vector<std::shared_ptr<lepton>> particles;
 
   // Add two electrons
-  particles.push_back(std::make_unique<electronClass>(electronClass::electron()));
-  particles.push_back(std::make_unique<electronClass>(electronClass::positron()));
+  particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+  particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
 
   // Add four muons
-  particles.push_back(std::make_unique<muonClass>());
-  particles.push_back(std::make_unique<muonClass>());
-  particles.push_back(std::make_unique<muonClass>());
-  particles.push_back(std::make_unique<muonClass>());
-  particles.push_back(std::make_unique<muonClass>(muonClass::antimuon()));
+  particles.push_back(std::make_shared<muonClass>());
+  particles.push_back(std::make_shared<muonClass>());
+  particles.push_back(std::make_shared<muonClass>());
+  particles.push_back(std::make_shared<muonClass>());
+  particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
 
   // Add one antielectron
-  particles.push_back(std::make_unique<electronClass>(electronClass::positron()));
+  particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
 
   // Add one antimuon
-  particles.push_back(std::make_unique<muonClass>(muonClass::antimuon()));
+  particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
 
   // Add one muon neutrino
-  particles.push_back(std::make_unique<neutrinoClass>(neutrinoClass::neutrino()));
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::neutrino()));
 
   // Add one electron neutrino
-  particles.push_back(std::make_unique<neutrinoClass>(neutrinoClass::antineutrino()));
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::antineutrino()));
 
   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
   tauClass tauParticle = tauClass::tau();
   tauParticle.leptonic_decay(true);
-  particles.push_back(std::make_unique<tauClass>(tauParticle));
+  particles.push_back(std::make_shared<tauClass>(tauParticle));
 
   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
   tauClass antitauParticle = tauClass::antitau();
   antitauParticle.leptonic_decay(true);
-  particles.push_back(std::make_unique<tauClass>(antitauParticle));
+  particles.push_back(std::make_shared<tauClass>(antitauParticle));
 
   // Print information of all particles in the vector
   for (const auto& particle : particles)
@@ -611,9 +665,9 @@ int main()
   double dot_product_result = dot_product(*particles[2], *particles[3]);
   std::cout << dot_product_result << std::endl;
 
-  // Create a unique pointer for a new electron and move its data to another electron using std::move
-  std::unique_ptr<electronClass> newElectron = std::make_unique<electronClass>(electronClass::electron());
-  std::unique_ptr<electronClass> anotherElectron = std::move(newElectron);
+  // Create a shared pointer for a new electron and move its data to another electron using std::move
+  std::shared_ptr<electronClass> newElectron = std::make_shared<electronClass>(electronClass::electron());
+  std::shared_ptr<electronClass> anotherElectron = std::move(newElectron);
 
   // Create a shared pointer for a tau lepton that is owned by multiple variables
   std::shared_ptr<tauClass> sharedTau = std::make_shared<tauClass>(tauClass::tau());
