@@ -36,12 +36,7 @@ class FourMomentum
     // parameterised constructor
     FourMomentum(double particle_energy, double particle_momentum_x, double particle_momentum_y, double particle_momentum_z):
     energy{particle_energy}, momentum_x{particle_momentum_x}, momentum_y{particle_momentum_y}, momentum_z{particle_momentum_z}
-    {
-      particle_energy = random_value();
-      particle_momentum_x = random_value();
-      particle_momentum_y = random_value();
-      particle_momentum_z = random_value();
-    }
+    {}
 
     // destructor
     ~FourMomentum() {}
@@ -170,18 +165,27 @@ class lepton
     double velocity{0}; // Between 0 and c, in m/s
     double beta{0}; // Between 0-1
     bool antiparticle;
-    std::shared_ptr<FourMomentum> fourMomentum; // Smart pointer to FourMomentum object
+    std::shared_ptr<FourMomentum> four_momentum; // Smart pointer to FourMomentum object
   
   public:
     // default constructor
-    lepton(): name{}, rest_mass{}, charge{}, velocity{}, beta{}, antiparticle{}, fourMomentum(std::make_shared<FourMomentum>()) {}
+    lepton(): name{}, rest_mass{}, charge{}, velocity{}, beta{}, antiparticle{}, four_momentum(std::make_shared<FourMomentum>()) {}
 
     // Parameterised Constructor
     lepton(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle):
-      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), fourMomentum(std::make_shared<FourMomentum>()) {}
+      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), four_momentum(std::make_shared<FourMomentum>()) {}
 
     // Destructor
     virtual ~lepton() {std::cout<<"Destroying lepton"<<std::endl;}
+
+    // Create the FourMomentum object
+    four_momentum = std::make_shared<FourMomentum>();
+    
+    // Set random values for energy and momenta using the setters
+    four_momentum->set_energy(random_value());
+    four_momentum->set_momentum_x(random_value());
+    four_momentum->set_momentum_y(random_value());
+    four_momentum->set_momentum_z(random_value());
 
     // Setter functions
     void set_rest_mass(double particle_rest_mass) {rest_mass = particle_rest_mass;}
@@ -255,7 +259,7 @@ class lepton
       velocity(copy.velocity),
       beta(copy.beta),
       antiparticle(copy.antiparticle),
-      fourMomentum(copy.fourMomentum ? std::make_shared<FourMomentum>(*copy.fourMomentum) : nullptr)
+      four_momentum(copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum) : nullptr)
     {}
 
     // Copy assignment operator
@@ -269,7 +273,7 @@ class lepton
         velocity = copy.velocity;
         beta = copy.beta;
         antiparticle = copy.antiparticle;
-        fourMomentum = copy.fourMomentum ? std::make_shared<FourMomentum>(*copy.fourMomentum) : nullptr;
+        four_momentum = copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum) : nullptr;
       }
       return *this;
     }
@@ -282,7 +286,7 @@ class lepton
       velocity(std::move(move.velocity)),
       beta(std::move(move.beta)),
       antiparticle(std::move(move.antiparticle)),
-      fourMomentum(std::move(move.fourMomentum))
+      four_momentum(std::move(move.four_momentum))
     {}
 
     // Move assignment operator
@@ -296,7 +300,7 @@ class lepton
         velocity = std::move(move.velocity);
         beta = std::move(move.beta);
         antiparticle = std::move(move.antiparticle);
-        fourMomentum = std::move(move.fourMomentum);
+        four_momentum = std::move(move.four_momentum);
       }
       return *this;
     }
@@ -307,16 +311,16 @@ class lepton
 // Friend function to calculate the dot product of two Lepton objects
 double dot_product(const lepton& particle1, const lepton& particle2)
 {
-  // Check if both particles have valid FourMomentum objects
-  if(!particle1.fourMomentum || !particle2.fourMomentum)
+  // Check if both particles have valid four_momentum objects
+  if(!particle1.four_momentum || !particle2.four_momentum)
   {
     std::cerr<<"Invalid particle: Four-momentum not initialized."<<std::endl;
     return 0.0;
   }
 
   // Access FourMomentum objects through smart pointers
-  const FourMomentum& momentum1 = *(particle1.fourMomentum);
-  const FourMomentum& momentum2 = *(particle2.fourMomentum);
+  const FourMomentum& momentum1 = *(particle1.four_momentum);
+  const FourMomentum& momentum2 = *(particle2.four_momentum);
 
   // Calculate dot product
   return momentum1.get_energy() * momentum2.get_energy() - momentum1.get_momentum_x() * momentum2.get_momentum_x() - momentum1.get_momentum_y() * momentum2.get_momentum_y() - momentum1.get_momentum_z() * momentum2.get_momentum_z();
@@ -326,15 +330,15 @@ double dot_product(const lepton& particle1, const lepton& particle2)
 FourMomentum sum(const lepton& particle1, const lepton& particle2)
 {
   // Check if both particles have valid FourMomentum objects
-  if(!particle1.fourMomentum || !particle2.fourMomentum)
+  if(!particle1.four_momentum || !particle2.four_momentum)
   {
     std::cerr<<"Invalid particle: Four-momentum not initialized."<<std::endl;
     return FourMomentum(); // Return default-constructed FourMomentum
   }
 
   // Access FourMomentum objects through smart pointers
-  const FourMomentum& momentum1 = *(particle1.fourMomentum);
-  const FourMomentum& momentum2 = *(particle2.fourMomentum);
+  const FourMomentum& momentum1 = *(particle1.four_momentum);
+  const FourMomentum& momentum2 = *(particle2.four_momentum);
 
   // Sum the components
   FourMomentum result;
@@ -709,7 +713,6 @@ int main()
   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
-  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
 
   // Add one antielectron
   particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
@@ -718,18 +721,20 @@ int main()
   particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
 
   // Add one muon neutrino
-  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::neutrino()));
+  neutrinoClass neutrino1("neutrino", 940.6, 0, random_value(), false, "muon", random_boolean());
+  particles.push_back(std::make_shared<neutrinoClass>(neutrino1));
 
   // Add one electron neutrino
-  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::antineutrino()));
+  neutrinoClass neutrino2("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());
+  particles.push_back(std::make_shared<neutrinoClass>(neutrino2));
 
   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
-  tauClass tau1 = tauClass::tau();
+  tauClass tau1("tau", 1777, -1, random_value(), false, true, false);
   tau1.leptonic_decay(true, [](){return muonClass::muon();});
   particles.push_back(std::make_shared<tauClass>(tau1));
 
   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
-  tauClass tau2 = tauClass::antitau();
+  tauClass tau2("antitau", 1777, 1, random_value(), true, true, false);
   tau2.leptonic_decay(true, [](){return electronClass::electron();});
   particles.push_back(std::make_shared<tauClass>(tau2));
 

@@ -159,3 +159,10 @@ int main()
   particles.push_back(&neutrino2);
   particles.push_back(&tau1);
   particles.push_back(&tau2);
+
+
+  // Add one muon neutrino
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::neutrino()));
+
+  // Add one electron neutrino
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::antineutrino()));
