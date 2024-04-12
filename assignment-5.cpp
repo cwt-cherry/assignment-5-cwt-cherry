@@ -10,8 +10,15 @@
 #include<memory> // Include the <memory> header for smart pointers
 
 #include <functional>
+#include <cstdlib> // for std::rand
 
 using std::string;
+
+// Random value generating function
+double random_value() {return static_cast<double>(std::rand()) / RAND_MAX;}
+
+// Convert the random number to boolean (0 -> false, 1 -> true), std::rand()%2 returns 2 values: 0 or 1
+bool random_boolean() {return static_cast<bool>(std::rand()%2);}
 
 // four-momentum class
 class FourMomentum
@@ -29,7 +36,12 @@ class FourMomentum
     // parameterised constructor
     FourMomentum(double particle_energy, double particle_momentum_x, double particle_momentum_y, double particle_momentum_z):
     energy{particle_energy}, momentum_x{particle_momentum_x}, momentum_y{particle_momentum_y}, momentum_z{particle_momentum_z}
-    {}
+    {
+      particle_energy = random_value();
+      particle_momentum_x = random_value();
+      particle_momentum_y = random_value();
+      particle_momentum_z = random_value();
+    }
 
     // destructor
     ~FourMomentum() {}
@@ -223,20 +235,17 @@ class lepton
     // Function to print info about a particle
     virtual void print() const
     {
+      std::cout<<"---------------------------------"<<std::endl;
       std::cout<<"particle type: "<<get_name()<<std::endl;
       std::cout<<"rest mass: "<<get_rest_mass()<<" MeV"<<std::endl;
       std::cout<<"charge: "<<get_charge()<<std::endl;
       std::cout<<"velocity: "<<get_velocity()<<" m/s"<<std::endl;
       std::cout<<"beta value: "<<get_beta()<<std::endl;
-      std::cout<<"---------------------------------"<<std::endl;
     }
 
     // Friend declaration
     friend double dot_product(const lepton& particle1, const lepton& particle2);
     friend FourMomentum sum(const lepton& particle1, const lepton& particle2);
-
-    // Static member function declaration
-    static double random_value();
 
     // Copy constructor
     lepton(const lepton& copy):
@@ -295,9 +304,6 @@ class lepton
 };
 // End of lepton class and associated member functions
 
-// generate random number
-double lepton::random_value() {return static_cast<double>(std::rand()) / RAND_MAX;}
-
 // Friend function to calculate the dot product of two Lepton objects
 double dot_product(const lepton& particle1, const lepton& particle2)
 {
@@ -355,7 +361,7 @@ class electronClass: public lepton
 
     // parameterised constructor
     electronClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), calorimeter_energies(4) {}
 
     // destructor
     ~electronClass() {std::cout<<"Destroying "<<name<<std::endl;}
@@ -420,6 +426,7 @@ class electronClass: public lepton
       {
         std::cout<<"Layer "<<i + 1<<": "<<calorimeter_energies[i]<<" MeV"<<std::endl;
       }
+      std::cout<<"---------------------------------"<<std::endl;
     }
 
     // Constructor for electron
@@ -475,18 +482,19 @@ class muonClass: public lepton
     bool get_isolated_status() const {return isolated_status;}
 
     // Constructor for muon
-    static muonClass muon() {return muonClass("muon", 105.6, -1, random_value(), false, false);}
+    static muonClass muon() {return muonClass("muon", 105.6, -1, random_value(), false, random_boolean());}
 
     // Constructor for antimuon
-    static muonClass antimuon() {return muonClass("antimuon", 105.6, +1, random_value(), true, false);}
+    static muonClass antimuon() {return muonClass("antimuon", 105.6, +1, random_value(), true, random_boolean());}
 
     // print muon data
     void print() const override
     {
       lepton::print(); // Call base class print function
 
-      // Print additional characteristics specific to muonClass
+      // Print additional characteristics specific to muonClass (if/ else if in short form)
       std::cout << "Isolated status: " << (isolated_status ? "Isolated" : "Not isolated") << std::endl;
+      std::cout<<"---------------------------------"<<std::endl;
     }
 };
 
@@ -542,10 +550,10 @@ class neutrinoClass: public lepton
     bool get_interaction() const {return hasInteracted;}
     
     // Constructor for neutrinos
-    static neutrinoClass neutrino() {return neutrinoClass("neutrino", 940.6, 0, random_value(), false, "electron", false);}
+    static neutrinoClass neutrino() {return neutrinoClass("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());}
 
     // Constructor for antineutrinos
-    static neutrinoClass antineutrino() {return neutrinoClass("antineutrino", 940.6, 0, random_value(), true, "electron", true);}
+    static neutrinoClass antineutrino() {return neutrinoClass("antineutrino", 940.6, 0, random_value(), true, "electron", random_boolean());}
 
     // print neutrino data
     void print() const override
@@ -555,6 +563,7 @@ class neutrinoClass: public lepton
       // Print additional characteristics specific to neutrinoClass
       std::cout << "Flavour: " << flavour << std::endl; 
       std::cout << "Interacted: " << (hasInteracted ? "Yes" : "No") << std::endl;
+      std::cout<<"---------------------------------"<<std::endl;
     }
 
 };
@@ -563,6 +572,8 @@ class neutrinoClass: public lepton
 class tauClass: public lepton
 {
   private:
+    bool hadronic_decay_status;
+    bool leptonic_decay_status;
     std::shared_ptr<lepton> decay_product_1; // Smart pointer for decay product 1
     std::shared_ptr<neutrinoClass> decay_product_2; // Smart pointer for decay product 2
     std::shared_ptr<neutrinoClass> decay_product_3; // Smart pointer for decay product 3
@@ -570,20 +581,14 @@ class tauClass: public lepton
   public:
 
     // default constructor
-    tauClass(): lepton{} {}
+    tauClass(): lepton{}, hadronic_decay_status{}, leptonic_decay_status{} {}
 
     // parameterised constructor
     tauClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle, bool particle_leptonic_decay, bool particle_hadronic_decay): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle) {}
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), leptonic_decay_status{particle_leptonic_decay}, hadronic_decay_status{particle_hadronic_decay} {}
 
     // destructor
     ~tauClass() {std::cout<<"Destroying "<<name<<std::endl;} 
-
-    // Constructor for tau
-    static tauClass tau() {return tauClass("tau", 1777, -1, random_value(), false, true, false);}
-
-    // Constructor for antitau
-    static tauClass antitau() {return tauClass("antitau", 1777, +1, random_value(), true, true, false);}
 
     // setter 
     void set_name(string particle_name)
@@ -601,8 +606,9 @@ class tauClass: public lepton
     // Flag for hadronic decay (leave it as flag)
     void hadronic_decay(bool decay)
     {
-      if(decay==true)
+      if(decay)
       {
+        hadronic_decay_status = true;
         if(name=="tau")
         {
           std::cout<<"Tau undergoes hadronic decay into hadrons and a tau neutrino."<<std::endl;
@@ -618,6 +624,7 @@ class tauClass: public lepton
       }
       else
       {
+        hadronic_decay_status = false;
         throw std::invalid_argument("Tau/ antitau does not go through hadronic decay.");
       }
     }
@@ -625,8 +632,9 @@ class tauClass: public lepton
     // Flag for leptonic decay
     void leptonic_decay(bool decay, std::function<lepton()>decay_product_input)
     {
-      if(decay==true)
+      if(decay)
       {
+        leptonic_decay_status = true;
         if(name=="tau")
         {
           // Smart pointers for decay products
@@ -648,76 +656,85 @@ class tauClass: public lepton
         }
         else
         {
+          leptonic_decay_status = false;
           throw std::invalid_argument("Invalid decay status.");
         }
       }
     }
 
-    // print tau data
-    void print() const override {lepton::print();}
+    // Constructor for tau
+    static tauClass tau() {return tauClass("tau", 1777, -1, random_value(), false, random_boolean(), random_boolean());}
 
+    // Constructor for antitau
+    static tauClass antitau() {return tauClass("antitau", 1777, +1, random_value(), true, random_boolean(), random_boolean());}
+
+    // print tau data
+    void print() const override 
+    {
+      lepton::print();
+      if (hadronic_decay_status)
+      {
+        std::cout << "Particle undergoes hadronic decay." << std::endl;
+      }
+      if (leptonic_decay_status)
+      {
+        std::cout << "Particle undergoes leptonic decay." << std::endl;
+        std::cout << "Decay Products:" << std::endl;
+        // Print information about decay products here
+        std::cout << "1. ";
+        if (decay_product_1) decay_product_1->print();
+        std::cout << "2. ";
+        if (decay_product_2) decay_product_2->print();
+        std::cout << "3. ";
+        if (decay_product_3) decay_product_3->print();
+      }
+      std::cout<<"---------------------------------"<<std::endl;
+    }
 };
 
 // Implementation of functions from a class should be done outside the class, preferably in another file
 
-
-// Random value generating function
-double random_value() {return static_cast<double>(std::rand()) / RAND_MAX;}
-
 // Main program
 int main()
 {
-  // Create the following particles:
+  // Create a vector of shared pointers to lepton objects
+  std::vector<std::shared_ptr<lepton>> particles;
+
   // Add two electrons
-  electronClass electron1("electron", 0.511, -1, random_value(), false);
-  electronClass electron2("electron", 0.511, -1, random_value(), false);
+  particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+  particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
 
   // Add four muons
-  muonClass muon1("muon", 105.6, -1, random_value(), false, false);
-  muonClass muon2("muon", 105.6, -1, random_value(), false, false);
-  muonClass muon3("muon", 105.6, -1, random_value(), false, true);
-  muonClass muon4("muon", 105.6, -1, random_value(), false, true);
+  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
 
   // Add one antielectron
-  electronClass electron3("positron", 0.511, 1, random_value(), true);
+  particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
 
   // Add one antimuon
-  muonClass muon5("antimuon", 105.6, 1, random_value(), true, true);
+  particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
 
   // Add one muon neutrino
-  neutrinoClass neutrino1("neutrino", 940.6, 0, random_value(), false, "muon", false);
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::neutrino()));
 
   // Add one electron neutrino
-  neutrinoClass neutrino2("neutrino", 940.6, 0, random_value(), false, "electron", true);
+  particles.push_back(std::make_shared<neutrinoClass>(neutrinoClass::antineutrino()));
 
   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
-  tauClass tau1("tau", 1777, -1, random_value(), false, true, false);
-  tau1.leptonic_decay(true, [](){ return muonClass::muon(); });
+  tauClass tau1 = tauClass::tau();
+  tau1.leptonic_decay(true, [](){return muonClass::muon();});
+  particles.push_back(std::make_shared<tauClass>(tau1));
 
   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
-  tauClass tau2("antitau", 1777, -1, random_value(), true, true, false);
-  tau2.leptonic_decay(true, [](){ return muonClass::muon(); });
-
-
-  // Create a vector of pointers to lepton objects
-  std::vector<lepton*> particles;
-
-  // Push pointers to the created particles into the vector
-  particles.push_back(&electron1);
-  particles.push_back(&electron2);
-  particles.push_back(&electron3);
-  particles.push_back(&muon1);
-  particles.push_back(&muon2);
-  particles.push_back(&muon3);
-  particles.push_back(&muon4);
-  particles.push_back(&muon5);
-
+  tauClass tau2 = tauClass::antitau();
+  tau2.leptonic_decay(true, [](){return electronClass::electron();});
+  particles.push_back(std::make_shared<tauClass>(tau2));
 
   // Print information of all particles in the vector
-  for(const auto& particle : particles)
-  {
-    particle->print();
-  }
+  for(const auto& particle : particles) {particle->print();}
 
   // Sum the four-vectors of the two electrons and print the result
   std::cout<<"Sum of four-vectors of electrons:"<<std::endl;
@@ -732,13 +749,13 @@ int main()
   double dot_product_result = dot_product(*particles[2], *particles[3]);
   std::cout<<dot_product_result<<std::endl;
 
-  // Create a shared pointer for a new electron and move its data to another electron using std::move
-  std::shared_ptr<electronClass> newElectron = std::make_shared<electronClass>(electronClass::electron());
-  std::shared_ptr<electronClass> anotherElectron = std::move(newElectron);
+  // Create a unique pointer for a new electron and move its data to another electron using std::move
+  std::unique_ptr<electronClass> new_electron = std::make_unique<electronClass>(electronClass::electron());
+  std::unique_ptr<electronClass> another_electron = std::move(new_electron);
 
   // Create a shared pointer for a tau lepton that is owned by multiple variables
-  std::shared_ptr<tauClass> sharedTau = std::make_shared<tauClass>(tauClass::tau());
-  std::shared_ptr<tauClass> sharedTauCopy = sharedTau;
+  std::shared_ptr<tauClass> shared_tau = std::make_shared<tauClass>(tauClass::tau());
+  std::shared_ptr<tauClass> shared_tau_copy = shared_tau;
 
   return 0;
 }

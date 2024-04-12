@@ -110,3 +110,52 @@ int main()
 //   tauClass antitauParticle = tauClass::antitau();
 //   antitauParticle.leptonic_decay(true);
 //   particles.push_back(std::make_shared<tauClass>(antitauParticle));
+
+
+  // Create the following particles:
+  // Add two electrons
+  electronClass electron1("electron", 0.511, -1, random_value(), false);
+  electronClass electron2("electron", 0.511, -1, random_value(), false);
+
+  // Add four muons
+  muonClass muon1("muon", 105.6, -1, random_value(), false, random_boolean());
+  muonClass muon2("muon", 105.6, -1, random_value(), false, random_boolean());
+  muonClass muon3("muon", 105.6, -1, random_value(), false, random_boolean());
+  muonClass muon4("muon", 105.6, -1, random_value(), false, random_boolean());
+
+  // Add one antielectron
+  electronClass electron3("positron", 0.511, 1, random_value(), true);
+
+  // Add one antimuon
+  muonClass muon5("antimuon", 105.6, 1, random_value(), true, random_boolean());
+
+  // Add one muon neutrino
+  neutrinoClass neutrino1("neutrino", 940.6, 0, random_value(), false, "muon", random_boolean());
+
+  // Add one electron neutrino
+  neutrinoClass neutrino2("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());
+
+  // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
+  tauClass tau1("tau", 1777, -1, random_value(), false, true, false);
+  tau1.leptonic_decay(true, [](){return muonClass::muon();});
+
+  // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
+  tauClass tau2("antitau", 1777, 1, random_value(), true, true, false);
+  tau2.leptonic_decay(true, [](){return muonClass::muon();});
+
+  // Create a vector of pointers to lepton objects
+  std::vector<lepton*> particles;
+
+  // Push pointers to the created particles into the vector
+  particles.push_back(&electron1);
+  particles.push_back(&electron2);
+  particles.push_back(&electron3);
+  particles.push_back(&muon1);
+  particles.push_back(&muon2);
+  particles.push_back(&muon3);
+  particles.push_back(&muon4);
+  particles.push_back(&muon5);
+  particles.push_back(&neutrino1);
+  particles.push_back(&neutrino2);
+  particles.push_back(&tau1);
+  particles.push_back(&tau2);
