@@ -243,7 +243,7 @@ class lepton
       std::cout<<"charge: "<<get_charge()<<std::endl;
       std::cout<<"velocity: "<<get_velocity()<<" m/s"<<std::endl;
       std::cout<<"beta value: "<<get_beta()<<std::endl;
-      std::cout << "antiparticle: " << std::boolalpha << get_antiparticle() << std::endl;
+      std::cout<<"antiparticle: "<<std::boolalpha<<get_antiparticle()<<std::endl;
       std::cout<<"four momentum vector: "<<"("<<four_momentum->get_energy()<<","<<four_momentum->get_momentum_x()<<","<<four_momentum->get_momentum_y()<<","<<four_momentum->get_momentum_z()<<") MeV"<<std::endl;
     }
 
@@ -326,17 +326,27 @@ double dot_product(const lepton& particle_1, const lepton& particle_2)
   return momentum_1.get_energy() * momentum_2.get_energy() - momentum_1.get_momentum_x() * momentum_2.get_momentum_x() - momentum_1.get_momentum_y() * momentum_2.get_momentum_y() - momentum_1.get_momentum_z() * momentum_2.get_momentum_z();
 }
 
-// Overload the addition operator for FourMomentum
-FourMomentum operator+(const FourMomentum& momentum1, const FourMomentum& momentum2)
+// Friend function to sum two Lepton objects
+FourMomentum sum(const lepton& particle_1, const lepton& particle_2)
 {
-  // Calculate the sum of energies and momenta
-  double energy_sum = momentum1.get_energy() + momentum2.get_energy();
-  double momentum_x_sum = momentum1.get_momentum_x() + momentum2.get_momentum_x();
-  double momentum_y_sum = momentum1.get_momentum_y() + momentum2.get_momentum_y();
-  double momentum_z_sum = momentum1.get_momentum_z() + momentum2.get_momentum_z();
+  // Check if both particles have valid FourMomentum objects
+  if(!particle_1.four_momentum || !particle_2.four_momentum)
+  {
+    std::cerr<<"Invalid particle: Four-momentum not initialized."<<std::endl;
+    return FourMomentum(); // Return default-constructed FourMomentum
+  }
 
-  // Return a new FourMomentum object with the summed values
-  return FourMomentum(energy_sum, momentum_x_sum, momentum_y_sum, momentum_z_sum);
+  // Access FourMomentum objects through smart pointers
+  const FourMomentum& momentum_1 = *(particle_1.four_momentum);
+  const FourMomentum& momentum_2 = *(particle_2.four_momentum);
+
+  // Sum the components
+  FourMomentum result;
+  result.set_energy(momentum_1.get_energy() + momentum_2.get_energy());
+  result.set_momentum_x(momentum_1.get_momentum_x() + momentum_2.get_momentum_x());
+  result.set_momentum_y(momentum_1.get_momentum_y() + momentum_2.get_momentum_y());
+  result.set_momentum_z(momentum_1.get_momentum_z() + momentum_2.get_momentum_z());
+  return result;
 }
 
 // Derived classes for other particles, and four-momentum class go here
@@ -400,10 +410,10 @@ class electronClass: public lepton
     void print_calorimeter_energies() const
     {
       std::vector<std::string> layer_names = {"EM 1", "EM 2", "HAD 1", "HAD 2"};
-      std::cout << "Energies deposited in calorimeter layers:" << std::endl;
+      std::cout<<"Energies deposited in calorimeter layers:"<<std::endl;
       for (size_t i = 0; i < calorimeter_energies.size(); ++i)
       {
-        std::cout << layer_names[i] << " layer: " << calorimeter_energies[i] << " MeV" << std::endl;
+        std::cout<<layer_names[i]<<" layer: "<<calorimeter_energies[i]<<" MeV"<<std::endl;
       }
     }
 
@@ -471,7 +481,7 @@ class muonClass: public lepton
       lepton::print(); // Call base class print function
 
       // Print additional characteristics specific to muonClass (if/ else if in short form)
-      std::cout << "Isolated status: " << (isolated_status ? "Isolated" : "Not isolated") << std::endl;
+      std::cout<<"Isolated status: "<<(isolated_status ? "Isolated" : "Not isolated")<<std::endl;
       std::cout<<"---------------------------------"<<std::endl;
     }
 };
@@ -539,8 +549,8 @@ class neutrinoClass: public lepton
       lepton::print(); // Call base class print function
 
       // Print additional characteristics specific to neutrinoClass
-      std::cout << "Flavour: " << flavour << std::endl; 
-      std::cout << "Interacted: " << (hasInteracted ? "Yes" : "No") << std::endl;
+      std::cout<<"Flavour: "<<flavour<<std::endl; 
+      std::cout<<"Interacted: "<<(hasInteracted ? "Yes" : "No")<<std::endl;
       std::cout<<"---------------------------------"<<std::endl;
     }
 
@@ -652,18 +662,18 @@ class tauClass: public lepton
       lepton::print();
       if (hadronic_decay_status)
       {
-        std::cout << "Particle undergoes hadronic decay." << std::endl;
+        std::cout<<"Particle undergoes hadronic decay."<<std::endl;
       }
       if (leptonic_decay_status)
       {
-        std::cout << "Particle undergoes leptonic decay." << std::endl;
-        std::cout << "Decay Products:" << std::endl;
+        std::cout<<"Particle undergoes leptonic decay."<<std::endl;
+        std::cout<<"Decay Products:"<<std::endl;
         // Print information about decay products here
-        std::cout << "1. ";
+        std::cout<<"1. ";
         if (decay_product_1) decay_product_1->print();
-        std::cout << "2. ";
+        std::cout<<"2. ";
         if (decay_product_2) decay_product_2->print();
-        std::cout << "3. ";
+        std::cout<<"3. ";
         if (decay_product_3) decay_product_3->print();
       }
       std::cout<<"---------------------------------"<<std::endl;
@@ -684,44 +694,49 @@ int main()
 
   // Add two electrons
   auto electron1 = std::make_shared<electronClass>(electronClass::electron());
-  auto electron2 = std::make_shared<electronClass>(electronClass::electron());
-
-  // Set deposit energy for each electron
   electron1->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
+
+  auto electron2 = std::make_shared<electronClass>(electronClass::electron());
   electron2->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
 
-  // Add electrons to the vector
-  particles.push_back(electron1);
-  particles.push_back(electron2);
-
   // Add four muons
-  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
-  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
-  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
-  particles.push_back(std::make_shared<muonClass>(muonClass::muon()));
+  auto muon1 = std::make_shared<muonClass>(muonClass::muon());
+  auto muon2 = std::make_shared<muonClass>(muonClass::muon());
+  auto muon3 = std::make_shared<muonClass>(muonClass::muon());
+  auto muon4 = std::make_shared<muonClass>(muonClass::muon());
 
   // Add one antielectron
-  particles.push_back(std::make_shared<electronClass>(electronClass::positron()));
+  auto electron3 = std::make_shared<electronClass>(electronClass::positron());
 
   // Add one antimuon
-  particles.push_back(std::make_shared<muonClass>(muonClass::antimuon()));
+  auto muon5 = std::make_shared<muonClass>(muonClass::antimuon());
 
   // Add one muon neutrino
   neutrinoClass neutrino1("neutrino", 940.6, 0, random_value(), false, "muon", random_boolean());
-  particles.push_back(std::make_shared<neutrinoClass>(neutrino1));
 
   // Add one electron neutrino
   neutrinoClass neutrino2("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());
-  particles.push_back(std::make_shared<neutrinoClass>(neutrino2));
 
   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
   tauClass tau1("tau", 1777, -1, random_value(), false, true, false);
   tau1.leptonic_decay(true, [](){return muonClass::muon();});
-  particles.push_back(std::make_shared<tauClass>(tau1));
 
   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
   tauClass tau2("antitau", 1777, 1, random_value(), true, true, false);
   tau2.leptonic_decay(true, [](){return electronClass::electron();});
+
+  // put all particles into a vector
+  particles.push_back(electron1);
+  particles.push_back(electron2);
+  particles.push_back(muon1);
+  particles.push_back(muon2);
+  particles.push_back(muon3);
+  particles.push_back(muon4);
+  particles.push_back(electron3);
+  particles.push_back(muon5);
+  particles.push_back(std::make_shared<neutrinoClass>(neutrino1));
+  particles.push_back(std::make_shared<neutrinoClass>(neutrino2));
+  particles.push_back(std::make_shared<tauClass>(tau1));
   particles.push_back(std::make_shared<tauClass>(tau2));
 
   // Print information of all particles in the vector
@@ -729,7 +744,7 @@ int main()
 
   // Sum the four-vectors of the two electrons and print the result
   std::cout<<"Sum of four-vectors of electrons:"<<std::endl;
-  FourMomentum electron_sum = sum(*particles[0], *particles[1]);
+  FourMomentum electron_sum = sum(*electron1, *electron2);
   std::cout<<"Energy: "<<electron_sum.get_energy()<<std::endl;
   std::cout<<"Momentum X: "<<electron_sum.get_momentum_x()<<std::endl;
   std::cout<<"Momentum Y: "<<electron_sum.get_momentum_y()<<std::endl;
@@ -737,7 +752,7 @@ int main()
 
   // Take the dot products of the antielectron and antimuon four-vector and print the result
   std::cout<<"Dot product of antielectron and antimuon four-vector: ";
-  double dot_product_result = dot_product(*particles[2], *particles[3]);
+  double dot_product_result = dot_product(*electron3, *muon5);
   std::cout<<dot_product_result<<std::endl;
 
   // Create a unique pointer for a new electron and move its data to another electron using std::move
