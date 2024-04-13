@@ -146,8 +146,8 @@ class FourMomentum
     }
 
   // Friend declarations
-  friend double dot_product(const FourMomentum& momentum1, const FourMomentum& momentum2);
-  friend FourMomentum sum(const FourMomentum& momentum1, const FourMomentum& momentum2);
+  friend double dot_product(const FourMomentum& momentum_1, const FourMomentum& momentum_2);
+  friend FourMomentum sum(const FourMomentum& momentum_1, const FourMomentum& momentum_2);
 
 };
 
@@ -173,19 +173,17 @@ class lepton
 
     // Parameterised Constructor
     lepton(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle):
-      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), four_momentum(std::make_shared<FourMomentum>()) {}
+      name{particle_name}, rest_mass{particle_rest_mass}, charge{particle_charge}, velocity{particle_velocity}, beta{particle_velocity/speed_of_light}, antiparticle(particle_antiparticle), four_momentum(std::make_shared<FourMomentum>()) 
+      {
+        // Set random values for energy and momenta using the setters
+        four_momentum->set_energy(random_value());
+        four_momentum->set_momentum_x(random_value());
+        four_momentum->set_momentum_y(random_value());
+        four_momentum->set_momentum_z(random_value());
+      }
 
     // Destructor
     virtual ~lepton() {std::cout<<"Destroying lepton"<<std::endl;}
-
-    // Create the FourMomentum object
-    four_momentum = std::make_shared<FourMomentum>();
-    
-    // Set random values for energy and momenta using the setters
-    four_momentum->set_energy(random_value());
-    four_momentum->set_momentum_x(random_value());
-    four_momentum->set_momentum_y(random_value());
-    four_momentum->set_momentum_z(random_value());
 
     // Setter functions
     void set_rest_mass(double particle_rest_mass) {rest_mass = particle_rest_mass;}
@@ -245,11 +243,13 @@ class lepton
       std::cout<<"charge: "<<get_charge()<<std::endl;
       std::cout<<"velocity: "<<get_velocity()<<" m/s"<<std::endl;
       std::cout<<"beta value: "<<get_beta()<<std::endl;
+      std::cout << "antiparticle: " << std::boolalpha << get_antiparticle() << std::endl;
+      std::cout<<"four momentum vector: "<<"("<<four_momentum->get_energy()<<","<<four_momentum->get_momentum_x()<<","<<four_momentum->get_momentum_y()<<","<<four_momentum->get_momentum_z()<<") MeV"<<std::endl;
     }
 
     // Friend declaration
-    friend double dot_product(const lepton& particle1, const lepton& particle2);
-    friend FourMomentum sum(const lepton& particle1, const lepton& particle2);
+    friend double dot_product(const lepton& particle_1, const lepton& particle_2);
+    friend FourMomentum sum(const lepton& particle_1, const lepton& particle_2);
 
     // Copy constructor
     lepton(const lepton& copy):
@@ -259,8 +259,8 @@ class lepton
       velocity(copy.velocity),
       beta(copy.beta),
       antiparticle(copy.antiparticle),
-      four_momentum(copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum) : nullptr)
-    {}
+      four_momentum(copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum):nullptr)
+      {}
 
     // Copy assignment operator
     lepton& operator=(const lepton& copy)
@@ -273,7 +273,7 @@ class lepton
         velocity = copy.velocity;
         beta = copy.beta;
         antiparticle = copy.antiparticle;
-        four_momentum = copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum) : nullptr;
+        four_momentum = copy.four_momentum ? std::make_shared<FourMomentum>(*copy.four_momentum):nullptr;
       }
       return *this;
     }
@@ -309,44 +309,34 @@ class lepton
 // End of lepton class and associated member functions
 
 // Friend function to calculate the dot product of two Lepton objects
-double dot_product(const lepton& particle1, const lepton& particle2)
+double dot_product(const lepton& particle_1, const lepton& particle_2)
 {
   // Check if both particles have valid four_momentum objects
-  if(!particle1.four_momentum || !particle2.four_momentum)
+  if(!particle_1.four_momentum || !particle_2.four_momentum)
   {
     std::cerr<<"Invalid particle: Four-momentum not initialized."<<std::endl;
     return 0.0;
   }
 
   // Access FourMomentum objects through smart pointers
-  const FourMomentum& momentum1 = *(particle1.four_momentum);
-  const FourMomentum& momentum2 = *(particle2.four_momentum);
+  const FourMomentum& momentum_1 = *(particle_1.four_momentum);
+  const FourMomentum& momentum_2 = *(particle_2.four_momentum);
 
   // Calculate dot product
-  return momentum1.get_energy() * momentum2.get_energy() - momentum1.get_momentum_x() * momentum2.get_momentum_x() - momentum1.get_momentum_y() * momentum2.get_momentum_y() - momentum1.get_momentum_z() * momentum2.get_momentum_z();
+  return momentum_1.get_energy() * momentum_2.get_energy() - momentum_1.get_momentum_x() * momentum_2.get_momentum_x() - momentum_1.get_momentum_y() * momentum_2.get_momentum_y() - momentum_1.get_momentum_z() * momentum_2.get_momentum_z();
 }
 
-// Friend function to sum two Lepton objects
-FourMomentum sum(const lepton& particle1, const lepton& particle2)
+// Overload the addition operator for FourMomentum
+FourMomentum operator+(const FourMomentum& momentum1, const FourMomentum& momentum2)
 {
-  // Check if both particles have valid FourMomentum objects
-  if(!particle1.four_momentum || !particle2.four_momentum)
-  {
-    std::cerr<<"Invalid particle: Four-momentum not initialized."<<std::endl;
-    return FourMomentum(); // Return default-constructed FourMomentum
-  }
+  // Calculate the sum of energies and momenta
+  double energy_sum = momentum1.get_energy() + momentum2.get_energy();
+  double momentum_x_sum = momentum1.get_momentum_x() + momentum2.get_momentum_x();
+  double momentum_y_sum = momentum1.get_momentum_y() + momentum2.get_momentum_y();
+  double momentum_z_sum = momentum1.get_momentum_z() + momentum2.get_momentum_z();
 
-  // Access FourMomentum objects through smart pointers
-  const FourMomentum& momentum1 = *(particle1.four_momentum);
-  const FourMomentum& momentum2 = *(particle2.four_momentum);
-
-  // Sum the components
-  FourMomentum result;
-  result.set_energy(momentum1.get_energy() + momentum2.get_energy());
-  result.set_momentum_x(momentum1.get_momentum_x() + momentum2.get_momentum_x());
-  result.set_momentum_y(momentum1.get_momentum_y() + momentum2.get_momentum_y());
-  result.set_momentum_z(momentum1.get_momentum_z() + momentum2.get_momentum_z());
-  return result;
+  // Return a new FourMomentum object with the summed values
+  return FourMomentum(energy_sum, momentum_x_sum, momentum_y_sum, momentum_z_sum);
 }
 
 // Derived classes for other particles, and four-momentum class go here
@@ -356,16 +346,15 @@ class electronClass: public lepton
 {
   private:
     std::vector<double> calorimeter_energies; // Vector to store energies deposited in each calorimeter layer
-    FourMomentum four_momentum;
     double total_energy;
   
   public:
     // dafault constructor
-    electronClass(): lepton{} {}
+    electronClass(): lepton{}, calorimeter_energies(4) {}
 
     // parameterised constructor
     electronClass(string particle_name, double particle_rest_mass, int particle_charge, double particle_velocity, bool particle_antiparticle): 
-    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), calorimeter_energies(4) {}
+    lepton(particle_name, particle_rest_mass, particle_charge, particle_velocity, particle_antiparticle), calorimeter_energies{} {}
 
     // destructor
     ~electronClass() {std::cout<<"Destroying "<<name<<std::endl;}
@@ -391,46 +380,31 @@ class electronClass: public lepton
       }
     }
 
-    void set_deposit_energy(const std::string& layer)
+    // setters
+    void set_deposit_energy(double EM_1_energy, double EM_2_energy, double HAD_1_energy, double HAD_2_energy)
     {
-      if(layer == "EM_1" || layer == "EM_2" || layer == "HAD_1" || layer == "HAD_2")
-      {
-        calorimeter_energies[0] = random_value();
-        calorimeter_energies[1] = random_value();
-        calorimeter_energies[2] = random_value();
-        calorimeter_energies[3] = random_value();
-      }
-      else
-      {
-        throw std::invalid_argument("Error: Invalid calorimeter layer specified.");
-      }
-    }
-
-    void set_total_energy()
-    {
-      if(calorimeter_energies[0] + calorimeter_energies[1] + calorimeter_energies[2] + calorimeter_energies[3]==four_momentum.get_energy())
-      {
-        total_energy = calorimeter_energies[0] + calorimeter_energies[1] + calorimeter_energies[2] + calorimeter_energies[3];
-      }
-      else
-      {
-        throw std::invalid_argument("Error. Total energy deposited in the calorimeter layers does not match the energy in four-momentum vector.");
-      }
+      double total_energy = EM_1_energy + EM_2_energy + HAD_1_energy + HAD_2_energy;
+      double normalization_factor = four_momentum->get_energy() / total_energy;
+      
+      // Set energies for calorimeter layers after normalizing
+      calorimeter_energies.push_back(EM_1_energy * normalization_factor);
+      calorimeter_energies.push_back(EM_2_energy * normalization_factor);
+      calorimeter_energies.push_back(HAD_1_energy * normalization_factor);
+      calorimeter_energies.push_back(HAD_2_energy * normalization_factor);
     }
 
     // getters
     std::vector<double> get_deposit_energy() {return calorimeter_energies;}
-    double get_total_energy() const {return total_energy;}
 
     // Function to print energies deposited in calorimeter layers
     void print_calorimeter_energies() const
     {
-      std::cout<<"Energies deposited in calorimeter layers:"<<std::endl;
-      for(size_t i = 0; i < calorimeter_energies.size(); ++i)
+      std::vector<std::string> layer_names = {"EM 1", "EM 2", "HAD 1", "HAD 2"};
+      std::cout << "Energies deposited in calorimeter layers:" << std::endl;
+      for (size_t i = 0; i < calorimeter_energies.size(); ++i)
       {
-        std::cout<<"Layer "<<i + 1<<": "<<calorimeter_energies[i]<<" MeV"<<std::endl;
+        std::cout << layer_names[i] << " layer: " << calorimeter_energies[i] << " MeV" << std::endl;
       }
-      std::cout<<"---------------------------------"<<std::endl;
     }
 
     // Constructor for electron
@@ -704,9 +678,21 @@ int main()
   // Create a vector of shared pointers to lepton objects
   std::vector<std::shared_ptr<lepton>> particles;
 
+  // // Add two electrons
+  // particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+  // particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+
   // Add two electrons
-  particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
-  particles.push_back(std::make_shared<electronClass>(electronClass::electron()));
+  auto electron1 = std::make_shared<electronClass>(electronClass::electron());
+  auto electron2 = std::make_shared<electronClass>(electronClass::electron());
+
+  // Set deposit energy for each electron
+  electron1->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
+  electron2->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
+
+  // Add electrons to the vector
+  particles.push_back(electron1);
+  particles.push_back(electron2);
 
   // Add four muons
   particles.push_back(std::make_shared<muonClass>(muonClass::muon()));

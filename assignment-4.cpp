@@ -47,7 +47,7 @@ int main()
   {
     each_particle.print_data();
   }
-
+  
   // Sum the four-momenta of the two electrons 
   particle sum_particle = electron1 + electron2;
   std::cout<<"Sum of four-momentum vector of 2 electrons = ";
