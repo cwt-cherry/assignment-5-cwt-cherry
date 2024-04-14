@@ -37,6 +37,30 @@ void electronClass::print_calorimeter_energies() const
   }
 }
 
+// Constructor for electron with deposit energy
+electronClass electronClass::electron()
+{
+  double EM_1_energy = random_value();
+  double EM_2_energy = random_value();
+  double HAD_1_energy = random_value();
+  double HAD_2_energy = random_value();
+  electronClass create_electron("electron", 0.511, -1, random_value(), false);
+  create_electron.set_deposit_energy(EM_1_energy, EM_2_energy, HAD_1_energy, HAD_2_energy);
+  return create_electron;
+}
+
+// Constructor for positron (antielectron)
+electronClass electronClass::positron()
+{
+  double EM_1_energy = random_value();
+  double EM_2_energy = random_value();
+  double HAD_1_energy = random_value();
+  double HAD_2_energy = random_value();
+  electronClass create_positron("positron", 0.511, +1, random_value(), true);
+  create_positron.set_deposit_energy(EM_1_energy, EM_2_energy, HAD_1_energy, HAD_2_energy);
+  return create_positron;
+}
+
 // Override the print function in each derived class
 void electronClass::print() const
 {

@@ -67,10 +67,7 @@ int main()
 
   // Add two electrons
   auto electron1 = std::make_shared<electronClass>(electronClass::electron());
-  electron1->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
-
   auto electron2 = std::make_shared<electronClass>(electronClass::electron());
-  electron2->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
 
   // Add four muons
   auto muon1 = std::make_shared<muonClass>(muonClass::muon());
@@ -80,7 +77,6 @@ int main()
 
   // Add one antielectron
   auto electron3 = std::make_shared<electronClass>(electronClass::positron());
-  electron3->set_deposit_energy(random_value(), random_value(), random_value(), random_value());
 
   // Add one antimuon
   auto muon5 = std::make_shared<muonClass>(muonClass::antimuon());
@@ -119,10 +115,7 @@ int main()
   // Sum the four-vectors of the two electrons and print the result
   std::cout<<"Sum of four-vectors of electrons:"<<std::endl;
   FourMomentum electron_sum = sum(*electron1, *electron2);
-  std::cout<<"Energy: "<<electron_sum.get_energy()<<std::endl;
-  std::cout<<"Momentum X: "<<electron_sum.get_momentum_x()<<std::endl;
-  std::cout<<"Momentum Y: "<<electron_sum.get_momentum_y()<<std::endl;
-  std::cout<<"Momentum Z: "<<electron_sum.get_momentum_z()<<std::endl;
+  std::cout<<"four momentum vector: ("<<electron_sum.get_energy()<<","<<electron_sum.get_momentum_x()<<","<<electron_sum.get_momentum_y()<<","<<electron_sum.get_momentum_z()<<")"<<std::endl;
 
   // Take the dot products of the antielectron and antimuon four-vector and print the result
   std::cout<<"Dot product of antielectron and antimuon four-vector: ";
@@ -132,11 +125,13 @@ int main()
   // Create a unique pointer for a new electron and move its data to another electron using std::move
   std::unique_ptr<electronClass> new_electron = std::make_unique<electronClass>(electronClass::electron());
   std::unique_ptr<electronClass> another_electron = std::move(new_electron);
+  std::cout<<"new electron with data moved from another electron:"<<std::endl;
   another_electron->print();
 
   // Create a shared pointer for a tau lepton that is owned by multiple variables
   std::shared_ptr<tauClass> shared_tau = std::make_shared<tauClass>(tauClass::tau());
   std::shared_ptr<tauClass> shared_tau_copy = shared_tau;
+  std::cout<<"tau lepton owned by multiple variables:"<<std::endl;
   shared_tau->print();
 
   return 0;

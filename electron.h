@@ -34,11 +34,11 @@ class electronClass: public lepton
     // Function to print energies deposited in calorimeter layers
     void print_calorimeter_energies() const;
 
-    // Constructor for electron
-    static electronClass electron() {return electronClass("electron", 0.511, -1, random_value(), false);}
+    // static function for electron
+    static electronClass electron();
 
-    // Constructor for positron (antielectron)
-    static electronClass positron() {return electronClass("positron", 0.511, +1, random_value(), true);}
+    // static function for positron (antielectron)
+    static electronClass positron();
 
     // Override the print function in each derived class
     void print() const override;
