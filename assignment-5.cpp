@@ -131,6 +131,7 @@ int main()
   // Create a shared pointer for a tau lepton that is owned by multiple variables
   std::shared_ptr<tauClass> shared_tau = std::make_shared<tauClass>(tauClass::tau());
   std::shared_ptr<tauClass> shared_tau_copy = shared_tau;
+  shared_tau->hadronic_decay(random_boolean());
   std::cout<<"tau lepton owned by multiple variables:"<<std::endl;
   shared_tau->print();
 

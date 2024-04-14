@@ -50,5 +50,4 @@ class tauClass: public lepton
 
 };
 
-
 #endif
