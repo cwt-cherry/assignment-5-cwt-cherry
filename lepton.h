@@ -11,10 +11,8 @@ using std::string;
 // base class
 class lepton
 {
-  private:
-
   protected:
-    string name; // electron, muon, tau, neutrino
+    string name; // only getters, setters in derived classes
     double rest_mass{0}; // Unit of MeV
     int charge{1}; // -1 or +1
     const double speed_of_light = 2.9979245e8; // Unit of m/s

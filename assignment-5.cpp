@@ -1,7 +1,6 @@
 // PHYS 30762 Programming in C++
 // Assignment 5
-// Practice inheritance in C++ classes
-// See slides for guidance
+// Practice inheritance, smart pointers and friendship in C++ classes
 
 #include<iostream>
 #include<string>
@@ -113,14 +112,12 @@ int main()
   for(const auto& particle : particles) {particle->print();}
 
   // Sum the four-vectors of the two electrons and print the result
-  std::cout<<"Sum of four-vectors of electrons:"<<std::endl;
   FourMomentum electron_sum = sum(*electron1, *electron2);
-  std::cout<<"four momentum vector: ("<<electron_sum.get_energy()<<","<<electron_sum.get_momentum_x()<<","<<electron_sum.get_momentum_y()<<","<<electron_sum.get_momentum_z()<<") MeV"<<std::endl;
+  std::cout<<"Sum of four-vectors of electrons: "<<"("<<electron_sum.get_energy()<<","<<electron_sum.get_momentum_x()<<","<<electron_sum.get_momentum_y()<<","<<electron_sum.get_momentum_z()<<") MeV"<<std::endl;
 
   // Take the dot products of the antielectron and antimuon four-vector and print the result
-  std::cout<<"Dot product of antielectron and antimuon four-vector: ";
   double dot_product_result = dot_product(*electron3, *muon5);
-  std::cout<<dot_product_result<<"(MeV)^2"<<std::endl;
+  std::cout<<"Dot product of antielectron and antimuon four-vector: "<<dot_product_result<<" (MeV)^2"<<std::endl;
 
   // Create a unique pointer for a new electron and move its data to another electron using std::move
   std::unique_ptr<electronClass> new_electron = std::make_unique<electronClass>(electronClass::electron());

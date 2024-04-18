@@ -49,7 +49,6 @@ class FourMomentum
     // Friend declarations
     friend double dot_product(const FourMomentum& momentum_1, const FourMomentum& momentum_2);
     friend FourMomentum sum(const FourMomentum& momentum_1, const FourMomentum& momentum_2);
-
 };
 
 #endif

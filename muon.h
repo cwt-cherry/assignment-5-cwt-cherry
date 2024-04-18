@@ -37,7 +37,6 @@ class muonClass: public lepton
 
     // print muon data
     void print() const override;
-
 };
 
 #endif

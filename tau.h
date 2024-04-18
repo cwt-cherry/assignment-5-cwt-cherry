@@ -40,14 +40,13 @@ class tauClass: public lepton
     void leptonic_decay(bool decay, std::function<lepton()>decay_product_input);
 
     // Constructor for tau
-    static tauClass tau() {return tauClass("tau", 1777, -1, random_value(), false, random_boolean(), random_boolean());}
+    static tauClass tau() {return tauClass("tau", 1777, -1, random_value(), false, random_boolean(), !random_boolean());} // either goes through hadronic or leptonic decay
 
     // Constructor for antitau
-    static tauClass antitau() {return tauClass("antitau", 1777, +1, random_value(), true, random_boolean(), random_boolean());}
+    static tauClass antitau() {return tauClass("antitau", 1777, +1, random_value(), true, random_boolean(), !random_boolean());}
 
     // print tau data
     void print() const override;
-
 };
 
 #endif

@@ -4,7 +4,7 @@
 // setters
 void FourMomentum::set_energy(double particle_energy)
 {
-  if(particle_energy >= 0) // not limiting energy to the speed of light due to change in slides
+  if(particle_energy >= 0)
   {
     energy = particle_energy;
   }
@@ -16,7 +16,7 @@ void FourMomentum::set_energy(double particle_energy)
 
 void FourMomentum::set_momentum_x(double particle_momentum_x)
 {
-  if(particle_momentum_x >= 0) // not limiting momentum to the speed of light due to change in slides
+  if(particle_momentum_x >= 0)
   {
     momentum_x = particle_momentum_x;
   }
@@ -28,7 +28,7 @@ void FourMomentum::set_momentum_x(double particle_momentum_x)
 
 void FourMomentum::set_momentum_y(double particle_momentum_y)
 {
-  if(particle_momentum_y >= 0) // not limiting momentum to the speed of light due to change in slides
+  if(particle_momentum_y >= 0)
   {
     momentum_y = particle_momentum_y;
   }
@@ -40,7 +40,7 @@ void FourMomentum::set_momentum_y(double particle_momentum_y)
 
 void FourMomentum::set_momentum_z(double particle_momentum_z)
 {
-  if(particle_momentum_z >= 0) // not limiting momentum to the speed of light due to change in slides
+  if(particle_momentum_z >= 0)
   {
     momentum_z = particle_momentum_z;
   }

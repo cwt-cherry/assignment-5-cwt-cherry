@@ -42,7 +42,6 @@ class electronClass: public lepton
 
     // Override the print function in each derived class
     void print() const override;
-
 };
 
 #endif

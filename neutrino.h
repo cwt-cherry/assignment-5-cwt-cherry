@@ -35,14 +35,13 @@ class neutrinoClass: public lepton
     bool get_interaction() const {return hasInteracted;}
     
     // Constructor for neutrinos
-    static neutrinoClass neutrino() {return neutrinoClass("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());}
+    static neutrinoClass neutrino() {return neutrinoClass("neutrino", 940.6, 0, random_value(), false, "electron", random_boolean());} //set default to electron neutrino
 
     // Constructor for antineutrinos
-    static neutrinoClass antineutrino() {return neutrinoClass("antineutrino", 940.6, 0, random_value(), true, "electron", random_boolean());}
+    static neutrinoClass antineutrino() {return neutrinoClass("antineutrino", 940.6, 0, random_value(), true, "electron", random_boolean());} // set default to electron antineutrino
 
     // print neutrino data
     void print() const override;
-
 };
 
 #endif
