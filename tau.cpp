@@ -42,7 +42,7 @@ void tauClass::hadronic_decay(bool decay)
 }
 
 // Flag for leptonic decay
-void tauClass::leptonic_decay(bool decay, std::function<lepton()>decay_product_input)
+void tauClass::leptonic_decay(bool decay, std::function<lepton()>decay_product_input, string decay_product_3_flavour, bool decay_product_3_antiparticle)
 {
   if(decay)
   {
@@ -53,8 +53,23 @@ void tauClass::leptonic_decay(bool decay, std::function<lepton()>decay_product_i
       decay_product_1 = std::make_shared<lepton>(decay_product_input());
       decay_product_2 = std::make_shared<neutrinoClass>(neutrinoClass::neutrino());
       decay_product_2->set_flavour("tau");
-      decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::neutrino());
-      decay_product_3->set_flavour(decay_product_1->get_name()); // the neutrino from decay has the same flavour of the lepton
+      if(decay_product_3_antiparticle)
+      {
+        decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::antineutrino());
+      }
+      else
+      {
+        decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::neutrino());
+      }
+      if(decay_product_1->get_antiparticle()==false)
+      {
+        decay_product_3->set_flavour(decay_product_1->get_name()); // the neutrino from decay has the same flavour of the lepton
+      }
+      else
+      {
+        decay_product_3->set_flavour(decay_product_3_flavour);
+      }
+      decay_product_3->set_antiparticle(decay_product_3_antiparticle); // Set antiparticle status
     }
     else if(name=="antitau")
     {
@@ -62,8 +77,23 @@ void tauClass::leptonic_decay(bool decay, std::function<lepton()>decay_product_i
       decay_product_1 = std::make_shared<lepton>(decay_product_input());
       decay_product_2 = std::make_shared<neutrinoClass>(neutrinoClass::antineutrino());
       decay_product_2->set_flavour("tau");
-      decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::antineutrino());
-      decay_product_3->set_flavour(decay_product_1->get_name()); // the neutrino from decay has the same flavour of the lepton
+      if(decay_product_3_antiparticle)
+      {
+        decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::antineutrino());
+      }
+      else
+      {
+        decay_product_3 = std::make_shared<neutrinoClass>(neutrinoClass::neutrino());
+      }
+      if(decay_product_1->get_antiparticle()==false)
+      {
+        decay_product_3->set_flavour(decay_product_1->get_name()); // the neutrino from decay has the same flavour of the lepton
+      }
+      else
+      {
+        decay_product_3->set_flavour(decay_product_3_flavour);
+      }
+      decay_product_3->set_antiparticle(decay_product_3_antiparticle); // Set antiparticle status
     }
     else
     {

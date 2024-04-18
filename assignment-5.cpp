@@ -88,11 +88,11 @@ int main()
 
   // Add one tau decaying into a muon, a muon antineutrino, and a tau neutrino
   tauClass tau1("tau", 1777, -1, random_value(), false, true, false);
-  tau1.leptonic_decay(true, [](){return muonClass::muon();});
+  tau1.leptonic_decay(true, [](){return muonClass::muon();}, "", true);
 
   // Add one antitau decaying into an antielectron, an electron neutrino, and a tau antineutrino
   tauClass tau2("antitau", 1777, 1, random_value(), true, true, false);
-  tau2.leptonic_decay(true, [](){return electronClass::electron();});
+  tau2.leptonic_decay(true, [](){return electronClass::positron();}, "electron", false);
 
   // put all particles into a vector
   particles.push_back(electron1);
@@ -122,6 +122,8 @@ int main()
   // Create a unique pointer for a new electron and move its data to another electron using std::move
   std::unique_ptr<electronClass> new_electron = std::make_unique<electronClass>(electronClass::electron());
   std::unique_ptr<electronClass> another_electron = std::move(new_electron);
+  std::cout << "Address of new electron: " << new_electron.get() << std::endl;
+  std::cout << "Address of another electron: " << another_electron.get() << std::endl;
   std::cout<<"new electron with data moved from another electron:"<<std::endl;
   another_electron->print();
 
@@ -129,7 +131,10 @@ int main()
   std::shared_ptr<tauClass> shared_tau = std::make_shared<tauClass>(tauClass::tau());
   std::shared_ptr<tauClass> shared_tau_copy = shared_tau;
   shared_tau->hadronic_decay(random_boolean());
-  std::cout<<"tau lepton owned by multiple variables:"<<std::endl;
+  std::cout << "Addresses of the pointers that own the tau lepton:" << std::endl;
+  std::cout << "shared_tau: " << shared_tau.get() << std::endl;
+  std::cout << "shared_tau_copy: " << shared_tau_copy.get() << std::endl;
+  std::cout<<"tau lepton owned by multiple variables:"<<std::endl; //print out the addresses of the pointer that owns it
   shared_tau->print();
 
   return 0;

@@ -37,7 +37,7 @@ class tauClass: public lepton
     void hadronic_decay(bool decay);
 
     // Flag for leptonic decay
-    void leptonic_decay(bool decay, std::function<lepton()>decay_product_input);
+    void leptonic_decay(bool decay, std::function<lepton()>decay_product_input, string decay_product_3_flavour, bool decay_product_3_antiparticle);
 
     // Constructor for tau
     static tauClass tau() {return tauClass("tau", 1777, -1, random_value(), false, random_boolean(), !random_boolean());} // either goes through hadronic or leptonic decay

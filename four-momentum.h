@@ -17,7 +17,18 @@ class FourMomentum
     // parameterised constructor
     FourMomentum(double particle_energy, double particle_momentum_x, double particle_momentum_y, double particle_momentum_z):
     energy{particle_energy}, momentum_x{particle_momentum_x}, momentum_y{particle_momentum_y}, momentum_z{particle_momentum_z}
-    {}
+    {
+      // Check if energy and momenta are non-negative
+      if (particle_energy < 0 || particle_momentum_x < 0 || particle_momentum_y < 0 || particle_momentum_z < 0)
+      {
+        throw std::invalid_argument("Invalid input. Energy and momenta should be non-negative.");
+      }
+      // Set the values if input is valid
+      energy = particle_energy;
+      momentum_x = particle_momentum_x;
+      momentum_y = particle_momentum_y;
+      momentum_z = particle_momentum_z;
+    }
 
     // destructor
     ~FourMomentum() {}
